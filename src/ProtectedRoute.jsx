@@ -1,10 +1,9 @@
 import React from 'react'
 import { useNavigate ,Navigate } from 'react-router'
+import useAuth from './hooks/useAuth';
 
 const ProtectedRoute = ({children}) => {
-    const navigate = useNavigate()
-    const token = localStorage.getItem("token")
-    console.log(token);
+    const {token} = useAuth()
     
     if(!token){
          return <Navigate to="/" replace />;

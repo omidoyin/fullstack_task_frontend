@@ -1,13 +1,15 @@
 import "./App.css";
-import Welcome from "./components/Welcome";
+import Welcome from "./pages/Welcome";
 import { Routes, Route } from "react-router";
-import Home from "./components/Home";
-import NotFound from "./components/NotFound";
-import Tasks from "./components/Tasks";
-import ProtectedRoute from "../ProtectedRoute";
+import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
+import Tasks from "./pages/Tasks";
+import ProtectedRoute from "./ProtectedRoute";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<Welcome />} />
       <Route
@@ -27,7 +29,11 @@ function App() {
         }
       />
       <Route path="*" element={<NotFound />} />
+    
     </Routes>
+    
+       <Toaster />
+    </>
   );
 }
 

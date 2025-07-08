@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import CustomButton from "./CustomButton";
+import CustomButton from "../components/CustomButton";
 
 const Home = () => {
   const navigate = useNavigate();

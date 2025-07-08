@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import dummydata from "../dummydata/tasksData.json";
-import Title from "./customHeaders/Title";
-import CustomButton from "./CustomButton";
+import Title from "../components/customHeaders/Title";
+import CustomButton from "../components/CustomButton";
 import API from "../services/api";
-import CustomInput from "./CustomInput";
-import { Bounce, toast, ToastContainer } from "react-toastify";
-import ToastMessage from "./ToastMessage";
+import CustomInput from "../components/CustomInput";
+import { taskSchema } from "../utils/validation";
+// import ToastMessage from "../components/ToastMessage";
 import { ThreeCircles } from "react-loader-spinner";
+// import { Toaster, toast } from "sonner";
+import { toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Tasks = () => {
   const [data, setData] = useState();
@@ -20,6 +24,15 @@ const Tasks = () => {
   const [editForm, setEditForm] = useState({ title: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: zodResolver(taskSchema),
+  });
 
   const handleNavigateToHome = () => {
     navigate("/home");
@@ -47,7 +60,7 @@ const Tasks = () => {
       const res = await API.get("/task/get-tasks");
       const data = res.data;
       if (!res.error) {
-        toast.success("Fetched");
+        // toast.success("Tasks fetched successfully");
         setData(data?.task);
       } else {
         setError(res.error);
@@ -97,12 +110,14 @@ const Tasks = () => {
       setEditLoading(false);
     }
   };
-  const handleSaveTask = async () => {
+  const handleSaveTask = async (data) => {
     setError("");
     setAddLoading(true);
     try {
-      const res = await API.post("/task/create-task", addForm);
+      const res = await API.post("/task/create-task", data);
       if (!res.error) {
+        toast.success("Tasks created successfully");
+        reset()
         handleGetTasks();
       } else {
         setError(res.error);
@@ -120,9 +135,8 @@ const Tasks = () => {
 
   return (
     <div className=" w-full flex justify-center">
-      <ToastMessage />
-        {loadingTasks && (
-      <div className=" absolute flex items-center justify-center w-full h-screen bg-black opacity-80">
+      {loadingTasks && (
+        <div className=" absolute flex items-center justify-center w-full h-screen bg-black opacity-80">
           <ThreeCircles
             visible={true}
             height="100"
@@ -132,8 +146,8 @@ const Tasks = () => {
             wrapperStyle={{}}
             wrapperClass=""
           />
-      </div>
-        )}
+        </div>
+      )}
 
       <div className=" w-full max-w-xl flex flex-col item-center mx-0">
         <div className=" flex justify-between  mb-20 mt-4">
@@ -174,27 +188,29 @@ const Tasks = () => {
               </div>
             </div>
           ) : (
-            <div className=" mb-10">
+            <form onSubmit={handleSubmit(handleSaveTask)} className=" mb-10">
               <div>Add new task</div>
               <div className="flex gap-2 items-center w-full justify-between">
                 <CustomInput
                   placeholder="title"
                   name="title"
-                  value={addForm?.title}
-                  onChange={handleSetAddValue}
+                  {...register("title")}
                 />
                 <CustomInput
                   placeholder="description"
                   name="description"
-                  value={addForm?.description}
-                  onChange={handleSetAddValue}
+                  {...register("description")}
                 />
 
-                <CustomButton loading={addLoading} onClick={handleSaveTask}>
+                <CustomButton
+                  type="submit"
+                  loading={addLoading}
+                  // onClick={handleSaveTask}
+                >
                   Save
                 </CustomButton>
               </div>
-            </div>
+            </form>
           )}
         </>
 
